@@ -1,0 +1,10 @@
+// Location model
+model Location {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // A location can have many items
+  items Item[]
+}

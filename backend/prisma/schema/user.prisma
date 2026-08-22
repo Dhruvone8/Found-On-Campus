@@ -22,11 +22,23 @@ model User {
   year            Int?
   profileImageUrl String?
   emailVerifiedAt DateTime?
-
-  status    UserStatus @default(ACTIVE)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  status          UserStatus @default(ACTIVE)
 
   // One to Many Relationship between User and Item
   postedItems Item[]
+
+  claims Claim[]
+
+  ConversationUser1 Conversation[] @relation("ConversationUser1")
+  ConversationUser2 Conversation[] @relation("ConversationUser2")
+
+  sentMessages Message[]
+
+  notifications Notification[]
+
+  reportsMade    Report[] @relation("Reporter")
+  reportsAgainst Report[] @relation("ReportedUser")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

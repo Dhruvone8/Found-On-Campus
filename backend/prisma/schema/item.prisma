@@ -32,6 +32,10 @@ model Item {
   locationId String
   location   Location @relation(fields: [locationId], references: [id])
 
+  claims Claim[]
+
+  images ItemImage[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

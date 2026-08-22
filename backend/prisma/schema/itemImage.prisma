@@ -1,0 +1,9 @@
+model ItemImage {
+  id  String @id @default(uuid())
+  url String
+
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id])
+
+  createdAt DateTime @default(now())
+}

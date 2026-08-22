@@ -1,0 +1,23 @@
+// Claim Model
+// A user claims that the item is theirs
+
+enum ClaimStatus {
+  PENDING
+  REJECTED
+  APPROVED
+}
+
+model Claim {
+  id           String      @id @default(uuid())
+  claimMessage String
+  status       ClaimStatus @default(PENDING)
+
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id])
+
+  claimantId String
+  claimant   User   @relation(fields: [claimantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

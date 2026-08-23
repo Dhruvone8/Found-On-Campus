@@ -1,11 +1,11 @@
 import express from "express";
-const app = express();
-app.use(express.json());
+import cors from "cors";
+import helmet from "helmet";
 
-app.get("/api/health", (req, res) => {
-    res.json({
-        status: "ok",
-    });
-});
+const app = express();
+
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
 
 export default app;

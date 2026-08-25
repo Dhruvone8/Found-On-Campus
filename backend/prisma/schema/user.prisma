@@ -1,4 +1,3 @@
-// User Model
 enum Role {
   STUDENT
   ADMIN
@@ -16,21 +15,19 @@ model User {
   name         String
   email        String @unique
   passwordHash String
-  role         Role   @default(STUDENT)
+
+  role   Role       @default(STUDENT)
+  status UserStatus @default(ACTIVE)
 
   department      String?
   year            Int?
   profileImageUrl String?
   emailVerifiedAt DateTime?
-  status          UserStatus @default(ACTIVE)
 
-  // One to Many Relationship between User and Item
-  postedItems Item[]
+  listings Listing[]
 
-  claims Claim[]
-
-  ConversationUser1 Conversation[] @relation("ConversationUser1")
-  ConversationUser2 Conversation[] @relation("ConversationUser2")
+  buyerConversations  Conversation[] @relation("BuyerConversations")
+  sellerConversations Conversation[] @relation("SellerConversations")
 
   sentMessages Message[]
 

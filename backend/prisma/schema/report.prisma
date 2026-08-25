@@ -1,3 +1,12 @@
+enum ReportReason {
+  FRAUD
+  PROHIBITED_ITEM
+  INAPPROPRIATE_CONTENT
+  MISLEADING_LISTING
+  HARASSMENT
+  OTHER
+}
+
 enum ReportStatus {
   PENDING
   REVIEWED
@@ -5,15 +14,21 @@ enum ReportStatus {
 }
 
 model Report {
-  id     String       @id @default(uuid())
-  reason String
+  id String @id @default(uuid())
+
+  reason      ReportReason
+  description String?
+
   status ReportStatus @default(PENDING)
 
   reporterId String
   reporter   User   @relation("Reporter", fields: [reporterId], references: [id])
 
-  reportedUserId String
-  reportedUser   User   @relation("ReportedUser", fields: [reportedUserId], references: [id])
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id])
+
+  reportedUserId String?
+  reportedUser   User?   @relation("ReportedUser", fields: [reportedUserId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

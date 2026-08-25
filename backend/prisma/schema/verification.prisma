@@ -6,7 +6,7 @@ enum VerificationPurpose {
 model Verification {
   id         String              @id @default(uuid())
   email      String
-  hashedOtp    String
+  hashedOtp  String
   purpose    VerificationPurpose
   expiresAt  DateTime
   attempts   Int                 @default(0)

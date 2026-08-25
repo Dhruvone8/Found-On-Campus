@@ -1,0 +1,39 @@
+enum ListingStatus {
+  ACTIVE
+  RESERVED
+  SOLD
+}
+
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+}
+
+model Listing {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  price       Decimal          @db.Decimal(10, 2)
+  condition   ListingCondition
+  status      ListingStatus    @default(ACTIVE)
+
+  brand String?
+  color String?
+  model String?
+
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  images ListingImage[]
+
+  conversations Conversation[]
+  reports       Report[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

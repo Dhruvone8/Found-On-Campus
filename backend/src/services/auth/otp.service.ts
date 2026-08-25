@@ -66,8 +66,10 @@ export async function verifyOtpCode(email: string, otp: string, purpose: "REGIST
         return false;
     }
 
+    // Check if the provided OTP matches the hashed OTP in the database
     const isValid = await verifyOtp(otp, otpRecord.hashedOtp);
 
+    // If the OTP is invalid, increment the attempts counter and return false
     if (!isValid) {
         await prisma.verification.update({
             where: {
@@ -83,6 +85,7 @@ export async function verifyOtpCode(email: string, otp: string, purpose: "REGIST
         return false;
     }
 
+    // If the OTP is valid, mark it as verified and return true
     await prisma.verification.update({
         where: {
             id: otpRecord.id,

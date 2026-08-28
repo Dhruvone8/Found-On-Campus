@@ -186,3 +186,70 @@ export async function register(req: Request, res: Response) {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+export async function login(req: Request, res: Response) {
+    try {
+        const { email, password } = req.body;
+
+        if (typeof email !== "string" || !email.trim()) {
+            return res.status(400).json({ message: "Email is required" })
+        }
+
+        if (typeof password !== "string" || password.length < 6) {
+            return res.status(400).json({
+                message: "Password is required"
+            })
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        // Find user with the email 
+        const user = await prisma.user.findUnique({
+            where: {
+                email: normalizedEmail,
+            },
+        });
+
+        // If user doesn't exist
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid Email or Password"
+            })
+        };
+
+        // If user exists, Check account status
+        if (user.status !== "ACTIVE") {
+            return res.status(403).json({
+                message: "Account is Banned or Suspended"
+            })
+        };
+
+        if (!user.passwordHash) {
+            return res.status(401).json({
+                message: "Invalid Email or Password"
+            });
+        }
+
+        // If account is active, verify the password
+        const isPasswordValid = await argon2.verify(user.passwordHash, password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                message: "Invalid Email or Password"
+            })
+        };
+
+        // If everything is fine, create the tokens and set cookies
+        const accessToken = await createAccessToken(user.id);
+        const refreshToken = await createRefreshToken(user.id);
+        setAuthCookies(res, accessToken, refreshToken);
+
+        return res.status(200).json({
+            message: "Login Successful"
+        });
+    } catch (error) {
+        console.error("Login error: ", error);
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
+    }
+}

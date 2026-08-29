@@ -1,3 +1,4 @@
+import { xContentTypeOptions } from "helmet";
 import { SignJWT, jwtVerify } from "jose";
 
 const accessSecret = new TextEncoder().encode(
@@ -35,5 +36,15 @@ export async function verifyAccessToken(token: string) {
 }
 
 export async function verifyRefreshToken(token: string) {
-  return jwtVerify(token, refreshSecret);
+  const { payload } = await jwtVerify(token, refreshSecret);
+
+  if (payload.type !== "refresh") {
+    throw new Error("Invalid token type");
+  }
+
+  if (typeof payload.sub !== "string") {
+    throw new Error("Invalid token object");
+  }
+
+  return payload.sub;
 }

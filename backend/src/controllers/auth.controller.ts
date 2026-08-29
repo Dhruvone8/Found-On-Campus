@@ -4,8 +4,8 @@ import { requestOtp, verifyOtpCode } from "../services/auth/otp.service.js";
 import { sendRegistrationOtpEmail } from "../services/email/email.service.js";
 import { verifyOtp } from "../lib/auth/otp.js";
 import argon2 from "argon2";
-import { createAccessToken, createRefreshToken } from "../lib/auth/tokens.js";
-import { setAuthCookies } from "../lib/auth/cookies.js";
+import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../lib/auth/tokens.js";
+import { setAuthCookies, setAccessTokenCookie } from "../lib/auth/cookies.js";
 
 export async function requestRegistrationOtp(req: Request, res: Response) {
     try {
@@ -251,5 +251,31 @@ export async function login(req: Request, res: Response) {
         return res.status(500).json({
             message: "Internal Server Error",
         });
+    }
+}
+
+export async function refreshAccessToken(req: Request, res: Response) {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const userId = await verifyRefreshToken(refreshToken);
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const accessToken = await createAccessToken(userId);
+
+        setAccessTokenCookie(res, accessToken);
+
+        return res.status(200).json({ message: "Access token refreshed successfully" });
+
+    } catch (error) {
+        console.error("Refresh token error", error);
+        return res.status(401).json({ message: "Unauthorized" });
     }
 }

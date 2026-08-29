@@ -20,6 +20,13 @@ export function setAuthCookies(res: Response, accessToken: string, refreshToken:
     });
 }
 
+export function setAccessTokenCookie(res: Response, accessToken: string) {
+    res.cookie("accessToken", accessToken, {
+        ...baseCookieOptions,
+        maxAge: 1000 * 60 * 15
+    });
+}
+
 export function clearAuthCookies(res: Response) {
     res.clearCookie("accessToken", baseCookieOptions);
     res.clearCookie("refreshToken", baseCookieOptions);

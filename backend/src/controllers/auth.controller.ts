@@ -5,7 +5,7 @@ import { sendRegistrationOtpEmail } from "../services/email/email.service.js";
 import { verifyOtp } from "../lib/auth/otp.js";
 import argon2 from "argon2";
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../lib/auth/tokens.js";
-import { setAuthCookies, setAccessTokenCookie } from "../lib/auth/cookies.js";
+import { setAuthCookies, setAccessTokenCookie, clearAuthCookies } from "../lib/auth/cookies.js";
 
 export async function requestRegistrationOtp(req: Request, res: Response) {
     try {
@@ -278,4 +278,10 @@ export async function refreshAccessToken(req: Request, res: Response) {
         console.error("Refresh token error", error);
         return res.status(401).json({ message: "Unauthorized" });
     }
+}
+
+export async function logout(_req: Request, res: Response) {
+    clearAuthCookies(res);
+
+    return res.status(200).json({ message: "Logout Successful" });
 }

@@ -27,3 +27,10 @@ export async function sendRegistrationOtpEmail(email: string, otp: string) {
         `Your SellOnCampus verification code is ${otp}. This code expires in 2 minutes`
     );
 }
+
+export async function sendPasswordResetOtpEmail(email: string, otp: string) {
+    await sendEmail(
+        email, "SellOnCampus Password Reset",
+        `Your SellOnCampus password reset code is ${otp}. This code expires in 2 minutes`
+    )
+}

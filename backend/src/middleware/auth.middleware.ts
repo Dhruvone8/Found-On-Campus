@@ -20,11 +20,9 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
         }
 
         req.userId = payload.sub;
-
         next();
+
     } catch {
-        return res.status(401).json({
-            message: "Invalid access token"
-        })
+        return res.status(401).json({ message: "Invalid access token" })
     }
 }

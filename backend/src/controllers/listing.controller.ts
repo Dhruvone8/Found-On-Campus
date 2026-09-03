@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { createListing as createListingService } from '../services/listing.service.js';
 import { AppError } from '../lib/error.js';
+import { getListingById as getListingByIdService } from '../services/listing.service.js';
 
 export async function createListing(req: Request, res: Response) {
     try {
@@ -38,5 +39,30 @@ export async function createListing(req: Request, res: Response) {
         return res.status(500).json({
             message: "Internal server error"
         });
+    }
+}
+
+export async function getListingById(req: Request, res: Response) {
+    try {
+        const { id } = req.params;
+
+        if(!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Invalid listing ID" });
+        }
+        
+        const listing = await getListingByIdService(id);
+
+        return res.status(200).json({ listing });
+
+    } catch (error) {
+        console.error("Get Listing by ID error:", error);
+
+        if (error instanceof AppError) {
+            return res.status(error.statusCode).json({
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({message: "Internal server error" });
     }
 }

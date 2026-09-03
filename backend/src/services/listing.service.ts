@@ -49,3 +49,20 @@ export async function createListing(data: CreateListingData) {
 
     return listing;
 }
+
+export async function getListingById(listingId: string) {
+    const listing = await prisma.listing.findUnique({
+        where: {
+            id: listingId
+        },
+        include: {
+            category: true,
+        }
+    });
+
+    if (!listing) {
+        throw new AppError("Listing not Found", 404);
+    }
+
+    return listing;
+}

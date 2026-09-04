@@ -3,6 +3,7 @@ import {
     createListing as createListingService, getListingById as getListingByIdService, updateListing as updateListingService
 } from '../services/listing.service.js';
 import { AppError } from '../lib/error.js';
+import { getListingById as getListingByIdService } from '../services/listing.service.js';
 
 export async function createListing(req: Request, res: Response) {
     try {

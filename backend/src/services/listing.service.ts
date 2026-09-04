@@ -146,3 +146,37 @@ export async function updateListing(listingId: string, userId: string, data: Upd
         data: updateData
     });
 }
+
+export async function updateListingStatus(listingId: string, userId: string, newStatus: "ACTIVE" | "RESERVED" | "SOLD") {
+    const listing = await prisma.listing.findUnique({
+        where: {
+            id: listingId,
+        }
+    });
+
+    if (!listing) {
+        throw new AppError("Listing not Found", 404);
+    }
+
+    if (listing.sellerId !== userId) {
+        throw new AppError("You are not authorized to update this listing", 403);
+    }
+
+    const validTransition =
+        (listing.status === "ACTIVE" && newStatus === "RESERVED") ||
+        (listing.status === "RESERVED" && newStatus === "ACTIVE") ||
+        (listing.status === "RESERVED" && newStatus === "SOLD");
+
+    if (!validTransition) {
+        throw new AppError(`Cannot change status from ${listing.status} to ${newStatus}`, 400);
+    }
+
+    return prisma.listing.update({
+        where: {
+            id: listingId,
+        },
+        data: {
+            status: newStatus
+        }
+    })
+}

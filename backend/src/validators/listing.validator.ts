@@ -22,3 +22,7 @@ export const updateListingSchema = z.object({
     color: z.string().trim().max(15).nullable().optional(),
     model: z.string().trim().max(30).nullable().optional(),
 }).refine((data) => Object.keys(data).length > 0, { message: "At least one field must be provided" });
+
+export const updateListingStatusSchema = z.object({
+    status: z.enum(["ACTIVE", "RESERVED", "SOLD"]),
+})

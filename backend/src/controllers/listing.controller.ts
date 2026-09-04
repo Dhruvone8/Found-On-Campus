@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express';
 import {
-    createListing as createListingService, getListingById as getListingByIdService, updateListing as updateListingService
+    createListing as createListingService, getListingById as getListingByIdService, updateListing as updateListingService,
+    updateListingStatus as updateListingStatusService
 } from '../services/listing.service.js';
 import { AppError } from '../lib/error.js';
-import { getListingById as getListingByIdService } from '../services/listing.service.js';
 
 export async function createListing(req: Request, res: Response) {
     try {
@@ -27,7 +27,7 @@ export async function createListing(req: Request, res: Response) {
             model
         });
 
-        return res.status(201).json({ message: "Listing created successfullt" });
+        return res.status(201).json({ message: "Listing created successfully" });
 
     } catch (error) {
         console.error("Create listing error:", error);
@@ -89,6 +89,38 @@ export async function updateListing(req: Request, res: Response) {
 
     } catch (error) {
         console.error("Update Listing error:", error);
+
+        if (error instanceof AppError) {
+            return res.status(error.statusCode).json({
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function updateListingStatus(req: Request, res: Response) {
+    try {
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthenticated" });
+        }
+
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Invalid listing ID" });
+        }
+
+        const listing = await updateListingStatusService(id, userId, status);
+
+        return res.status(200).json({ message: "Listing status updated successfully", listing });
+
+    } catch (error) {
+        console.error("Update Listing Status Error: ", error);
 
         if (error instanceof AppError) {
             return res.status(error.statusCode).json({

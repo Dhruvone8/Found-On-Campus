@@ -13,6 +13,17 @@ interface CreateListingData {
     model?: string;
 }
 
+interface UpdateListingData {
+    title?: string;
+    description?: string;
+    price?: number;
+    categoryId?: string;
+    condition?: "NEW" | "LIKE_NEW" | "GOOD" | "FAIR";
+    brand?: string | null;
+    color?: string | null;
+    model?: string | null;
+}
+
 export async function createListing(data: CreateListingData) {
     const category = await prisma.category.findUnique({
         where: {
@@ -65,4 +76,73 @@ export async function getListingById(listingId: string) {
     }
 
     return listing;
+}
+
+export async function updateListing(listingId: string, userId: string, data: UpdateListingData) {
+    const listing = await prisma.listing.findUnique({
+        where: {
+            id: listingId
+        }
+    });
+
+    if (!listing) {
+        throw new AppError("Listing not Found", 404);
+    }
+
+    if (listing.sellerId !== userId) {
+        throw new AppError("You are not authorized to update this listing", 403);
+    }
+
+    if (data.categoryId !== undefined) {
+        const category = await prisma.category.findUnique({
+            where: {
+                id: data.categoryId
+            }
+        });
+
+        if (!category) {
+            throw new AppError("Category not found", 404);
+        }
+    }
+
+    const updateData = {
+        ...(data.title !== undefined && {
+            title: data.title
+        }),
+
+        ...(data.description !== undefined && {
+            description: data.description
+        }),
+
+        ...(data.price !== undefined && {
+            price: data.price
+        }),
+
+        ...(data.categoryId !== undefined && {
+            categoryId: data.categoryId
+        }),
+
+        ...(data.condition !== undefined && {
+            condition: data.condition
+        }),
+
+        ...("brand" in data && {
+            brand: data.brand
+        }),
+
+        ...("color" in data && {
+            color: data.color
+        }),
+
+        ...("model" in data && {
+            model: data.model
+        })
+    };
+
+    return prisma.listing.update({
+        where: {
+            id: listingId
+        },
+        data: updateData
+    });
 }

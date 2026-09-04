@@ -10,3 +10,15 @@ export const createListingSchema = z.object({
     model: z.string().trim().max(30).optional(),
     color: z.string().trim().max(15).optional(),
 });
+
+export const updateListingSchema = z.object({
+    title: z.string().trim().min(3).max(50).optional(),
+    description: z.string().trim().min(10).max(200).optional(),
+    price: z.number().nonnegative().optional(),
+    categoryId: z.string().min(1).optional(),
+    condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR"]).optional(),
+
+    brand: z.string().trim().max(20).nullable().optional(),
+    color: z.string().trim().max(15).nullable().optional(),
+    model: z.string().trim().max(30).nullable().optional(),
+}).refine((data) => Object.keys(data).length > 0, { message: "At least one field must be provided" });

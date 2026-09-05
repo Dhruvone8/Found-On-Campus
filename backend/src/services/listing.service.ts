@@ -211,4 +211,34 @@ export async function getMyListings(userId: string, page: number, limit: number)
     return {
         listings, pagination: { page, limit, total, totalPages }
     }
-} 
+}
+
+export async function getListings(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [listings, total] = await Promise.all([
+        prisma.listing.findMany({
+            where: {
+                status: "ACTIVE",
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            skip,
+            take: limit,
+            include: {
+                category: true
+            }
+        }),
+
+        prisma.listing.count({
+            where: {
+                status: "ACTIVE",
+            }
+        })
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return { listings, pagination: { page, limit, total, totalPages } };
+}
